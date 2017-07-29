@@ -81,7 +81,7 @@ app.put("/miners/:name", function (req, res) {
                 return;
             }
             pm2[action](process, function(err, apps) {
-                pm2.disconnect();   // Disconnects from PM2
+                // pm2.disconnect();   // Disconnects from PM2
                 if (err) {
                     res.status(500).json(err.message);
                     return;
@@ -103,5 +103,21 @@ io.on("connection", function (client) {
 });
 http.listen(PORT, function () {
     console.log('Server is running on port: ' + PORT);
+    pm2.connect(function(err) {
+        if (err) {
+            console.error(err);
+            process.exit(0);
+            return;
+        }
+        pm2.launchBus(function (err, bus) {
+            bus.off('log:out');
+            bus.on('log:out', function (data) {
+                var processName = data.process.name;
+                if (MINERS.indexOf(processName) >= 0) {
+                    io.emit(`${processName}:log`, {log: data.data})
+                }
+            });
+        });
+    });
 });
 module.exports = app;

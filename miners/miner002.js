@@ -4,4 +4,4 @@ setInterval(function () {
         Math.random();
     }
     console.log("Detect a block on chanel: " + Math.random());
-}, 2000);
+}, 5000);

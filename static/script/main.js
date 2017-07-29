@@ -42,6 +42,21 @@ $(document).ready(function () {
                 }
             });
         }
+        if (action === "tail") {
+            // To unsubscribe all listeners of an log event
+            $('#tbl-miners').find('tbody').find('tr').each(function () {
+                socket.off(`${$(this).attr('id')}:log`);
+            });
+            var jConsole = $('#console');
+            jConsole.empty();
+            socket.on(`${process}:log`, function (data) {
+                if (jConsole.find('p').length > 32) {
+                    jConsole.empty();
+                }
+                jConsole.append(`<p id="console-text">${data.log}</p>`);
+                console.log(data);
+            });
+        }
     });
     function getStatusLabel(status) {
         switch (status) {
